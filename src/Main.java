@@ -1,96 +1,72 @@
 public class Main {
     public static void main(String[] args) {
-        // Создаем объекты классов Cat и Dog
-        Cat catMurzik = new Cat("Мурзик");
-        Dog dogBobik = new Dog("Бобик");
-        Cat catBarsik = new Cat("Барсик"); // Добавим еще одного кота для демонстрации счетчика
+        Employee[] employees = new Employee[]{
+                new Employee("Иванов Кирилл Иванович", "Программист", "ivan24990@gmail.com", "+7(999)-123-45-67", 96000, 35),
+                new Employee("Сидоров Павел Алексеевич", "Тестировщик", "petr92163872@mail.ru", "+7(975)-755-57-15", 74000, 50),
+                new Employee("Петрова Анна Сергеевна", "Менеджер", "anna1980@gmail.com", "+7(943)-987-65-43", 67000, 45),
+                new Employee("Кузнецова Людмила Владимировна", "Дизайнер", "maria2344@gmail.com", "+7(931)-111-92-33", 71000, 30),
+                new Employee("Смирнов Дмитрий Николаевич", "HR", "d1mas@mail.ru", "+7(972)-444-59-15", 66000, 42)
+        };
 
-        // Демонстрация работы методов run и swim для кота
-        catMurzik.run(150);
-        catMurzik.run(250);
-        catMurzik.swim(5);
-
-        // Демонстрация работы методов run и swim для собаки
-        dogBobik.run(300);
-        dogBobik.run(600);
-        dogBobik.swim(5);
-        dogBobik.swim(15);
-
-        // Вывод статистики созданных животных
-        System.out.println("\nСтатистика:");
-        System.out.println("Всего животных: " + Animal.getAnimalCount());
-        System.out.println("Всего котов: " + Cat.getCatCount());
-        System.out.println("Всего собак: " + Dog.getDogCount());
+        System.out.println("\nСотрудники старше 40 лет:");
+        for (Employee employee : employees) {
+            if (employee.getAge() > 40) {
+                employee.printInfo();
+            }
+        }
     }
 }
 
-// Базовый класс Animal для всех животных
-abstract class Animal {
-    private static int animalCount = 0; // Счетчик созданных животных
+class Employee {
+    private final String fullName;
+    private final String position;
+    private final String email;
+    private final String phone;
+    private int salary;
+    private int age;
 
-    protected final String name;
-    protected final int runLimit;
-    protected final int swimLimit;
+    public Employee(String fullName, String position, String email, String phone, int salary, int age) {
+        this.fullName = fullName;
+        this.position = position;
+        this.email = email;
+        this.phone = phone;
 
-    public Animal(String name, int runLimit, int swimLimit) {
-        this.name = name;
-        this.runLimit = runLimit;
-        this.swimLimit = swimLimit;
-        animalCount++;
+        // Проверки с установкой значений по умолчанию при невалидных данных
+        this.salary = salary > 0 ? salary : 30000; // если зарплата <= 0, ставим 30000
+        this.age = age >= 18 ? age : 18;          // если возраст < 18, ставим 18
     }
 
-    // Метод для бега
-    public void run(int distance) {
-        if (distance <= runLimit) {
-            System.out.println(name + " пробежал " + distance + " м.");
+    public int getAge() {
+        return age;
+    }
+
+    public void printInfo() {
+        System.out.println("╔════════════════════════════════════╗");
+        System.out.printf("║ %-34s ║\n", "ФИО: " + fullName);
+        System.out.println("╠════════════════════════════════════╣");
+        System.out.printf("║ %-34s ║\n", "Должность: " + position);
+        System.out.printf("║ %-34s ║\n", "Email: " + email);
+        System.out.printf("║ %-34s ║\n", "Телефон: " + phone);
+        System.out.printf("║ %-34s ║\n", "Зарплата: " + salary + " руб.");
+        System.out.printf("║ %-34s ║\n", "Возраст: " + age + " лет");
+        System.out.println("╚════════════════════════════════════╝");
+        System.out.println();
+    }
+
+    // Дополнительные методы для изменения зарплаты и возраста
+    public void setSalary(int newSalary) {
+        if (newSalary > 0) {
+            this.salary = newSalary;
         } else {
-            System.out.println(name + " не может пробежать " + distance + " м. (лимит " + runLimit + " м.)");
+            System.out.println("Ошибка: зарплата должна быть положительной");
         }
     }
 
-    // Метод для плавания
-    public void swim(int distance) {
-        if (swimLimit == 0) {
-            System.out.println(name + " не умеет плавать.");
-        } else if (distance <= swimLimit) {
-            System.out.println(name + " проплыл " + distance + " м.");
+    public void setAge(int newAge) {
+        if (newAge >= 18) {
+            this.age = newAge;
         } else {
-            System.out.println(name + " не может проплыть " + distance + " м. (лимит " + swimLimit + " м.)");
+            System.out.println("Ошибка: возраст должен быть 18+");
         }
-    }
-
-    // Геттер для счетчика животных
-    public static int getAnimalCount() {
-        return animalCount;
-    }
-}
-
-// Класс Cat наследуется от Animal
-class Cat extends Animal {
-    private static int catCount = 0; // Счетчик созданных котов
-
-    public Cat(String name) {
-        super(name, 200, 0);
-        catCount++;
-    }
-
-    // Геттер для счетчика котов
-    public static int getCatCount() {
-        return catCount;
-    }
-}
-
-// Класс Dog наследуется от Animal
-class Dog extends Animal {
-    private static int dogCount = 0; // Счетчик созданных собак
-
-    public Dog(String name) {
-        super(name, 500, 10);
-        dogCount++;
-    }
-
-    // Геттер для счетчика собак
-    public static int getDogCount() {
-        return dogCount;
     }
 }

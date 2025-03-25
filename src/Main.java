@@ -1,64 +1,127 @@
+import java.util.Random;
+import java.util.InputMismatchException; // Для обработки нечислового ввода
 import java.util.Scanner;
 
 public class Main {
+    // Глобальные переменные для настроек игры
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final Random random = new Random();
+    private static int maxNumber = 10;
+    private static int attempts = 3;
+
     public static void main(String[] args) {
-        // 1. Инициализация переменных всех типов
-        byte byteVar = 120;
-        short shortVar = -25000;
-        int intVar = 2_000_000_000;
-        long longVar = 9_000_000_000_000L;
-        float floatVar = 3.1415f;
-        double doubleVar = 2.71828;
-        char charVar = 'Ї';
-        boolean boolVar = true;
-        String stringVar = "Привет";
-
-        // Вызов остальных задач
-        task_2();
-        task_3();
-        task_4();
-        task_5();
+        startGame();
     }
 
-    // 2. Приветствие пользователя
-    private static void task_2() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("\nВведите ваше имя: ");
-        String name = scanner.nextLine();
-        System.out.println("Привет, " + name + "!");
-    }
+    static void startGame() {
+        boolean quit = false;
 
-    // 3. Проверка числа на отрицательность
-    private static void task_3() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("\nВведите число для проверки: ");
-        int number = scanner.nextInt();
-        System.out.println("Результат: " + (number < 0));
-    }
+        System.out.println("Добро пожаловать в игру 'Угадай число'!");
+        while (!quit) {
+            System.out.println("\n0 - Выйти из игры");
+            System.out.println("1 - Начать игру");
+            System.out.println("2 - Настройки");
 
-    // 4. Определение знака числа
-    private static void task_4() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("\nВведите число для проверки знака: ");
-        int number = scanner.nextInt();
-
-        if (number > 0) {
-            System.out.println("Результат: положительное");
-        } else if (number < 0) {
-            System.out.println("Результат: отрицательное");
-        } else {
-            System.out.println("Результат: ноль");
-        }
-    }
-
-    // 5. Числа кратные 3
-    private static void task_5() {
-        System.out.println("\nЧисла от 1000 до 0, кратные 3:");
-        for (int i = 1000; i >= 0; i--) {
-            if (i % 3 == 0) {
-                System.out.print(i + " ");
+            try {
+                int choice = scanner.nextInt();
+                switch (choice) {
+                    case 0:
+                        System.out.println("Спасибо за игру!");
+                        quit = true;
+                        break;
+                    case 1:
+                        playGame();
+                        break;
+                    case 2:
+                        showOptions();
+                        break;
+                    default:
+                        System.out.println("Ошибка! Введите 0, 1 или 2");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Ошибка! Введите число, а не текст.");
+                scanner.next(); // Очистка неправильного ввода
             }
         }
-        System.out.println("\n");
+        scanner.close();
+    }
+
+    static void playGame() {
+        boolean playAgain = true;
+
+        while (playAgain) {
+            int secretNumber = random.nextInt(maxNumber + 1);
+            boolean guessed = false;
+
+            System.out.println("\nУгадайте число от 0 до " + maxNumber);
+            System.out.println("У вас " + attempts + " попыток");
+
+            for (int i = 0; i < attempts && !guessed; i++) {
+                System.out.print("Попытка " + (i + 1) + "/" + attempts + ": ");
+
+                try {
+                    int guess = scanner.nextInt();
+
+                    if (guess == secretNumber) {
+                        System.out.println("Поздравляем! Вы угадали!");
+                        guessed = true;
+                    } else if (guess > secretNumber) {
+                        System.out.println("Слишком много!");
+                    } else {
+                        System.out.println("Слишком мало!");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Ошибка! Введите число, а не текст.");
+                    scanner.next(); // Очистка неправильного ввода
+                    i--; // Не засчитываем эту попытку
+                }
+            }
+
+            if (!guessed) {
+                System.out.println("К сожалению, вы не угадали. Число было: " + secretNumber);
+            }
+
+            System.out.print("\nСыграем ещё раз? (1 - Да, 0 - Нет): ");
+            try {
+                int choice = scanner.nextInt();
+                playAgain = (choice == 1);
+            } catch (InputMismatchException e) {
+                System.out.println("Ошибка ввода! Игра завершена.");
+                playAgain = false;
+            }
+        }
+    }
+
+    static void showOptions() {
+        boolean exit = false;
+
+        System.out.println("\n=== Настройки игры ===");
+        while (!exit) {
+            System.out.println("\n0 - Назад");
+            System.out.println("1 - Изменить количество попыток (текущее: " + attempts + ")");
+            System.out.println("2 - Изменить максимальное число (текущее: " + maxNumber + ")");
+
+            try {
+                int choice = scanner.nextInt();
+                switch (choice) {
+                    case 0:
+                        exit = true;
+                        break;
+                    case 1:
+                        System.out.print("Введите новое количество попыток: ");
+                        attempts = scanner.nextInt();
+                        break;
+                    case 2:
+                        System.out.print("Введите новое максимальное число: ");
+                        maxNumber = scanner.nextInt();
+                        break;
+                    default:
+                        System.out.println("Ошибка! Введите 0, 1 или 2");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Ошибка! Введите число, а не текст.");
+                scanner.next();
+            }
+        }
     }
 }

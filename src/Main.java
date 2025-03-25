@@ -1,127 +1,96 @@
-import java.util.Random;
-import java.util.InputMismatchException; // Для обработки нечислового ввода
-import java.util.Scanner;
-
 public class Main {
-    // Глобальные переменные для настроек игры
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final Random random = new Random();
-    private static int maxNumber = 10;
-    private static int attempts = 3;
-
     public static void main(String[] args) {
-        startGame();
+        // Создаем объекты классов Cat и Dog
+        Cat catMurzik = new Cat("Мурзик");
+        Dog dogBobik = new Dog("Бобик");
+        Cat catBarsik = new Cat("Барсик"); // Добавим еще одного кота для демонстрации счетчика
+
+        // Демонстрация работы методов run и swim для кота
+        catMurzik.run(150);
+        catMurzik.run(250);
+        catMurzik.swim(5);
+
+        // Демонстрация работы методов run и swim для собаки
+        dogBobik.run(300);
+        dogBobik.run(600);
+        dogBobik.swim(5);
+        dogBobik.swim(15);
+
+        // Вывод статистики созданных животных
+        System.out.println("\nСтатистика:");
+        System.out.println("Всего животных: " + Animal.getAnimalCount());
+        System.out.println("Всего котов: " + Cat.getCatCount());
+        System.out.println("Всего собак: " + Dog.getDogCount());
+    }
+}
+
+// Базовый класс Animal для всех животных
+abstract class Animal {
+    private static int animalCount = 0; // Счетчик созданных животных
+
+    protected final String name;
+    protected final int runLimit;
+    protected final int swimLimit;
+
+    public Animal(String name, int runLimit, int swimLimit) {
+        this.name = name;
+        this.runLimit = runLimit;
+        this.swimLimit = swimLimit;
+        animalCount++;
     }
 
-    static void startGame() {
-        boolean quit = false;
-
-        System.out.println("Добро пожаловать в игру 'Угадай число'!");
-        while (!quit) {
-            System.out.println("\n0 - Выйти из игры");
-            System.out.println("1 - Начать игру");
-            System.out.println("2 - Настройки");
-
-            try {
-                int choice = scanner.nextInt();
-                switch (choice) {
-                    case 0:
-                        System.out.println("Спасибо за игру!");
-                        quit = true;
-                        break;
-                    case 1:
-                        playGame();
-                        break;
-                    case 2:
-                        showOptions();
-                        break;
-                    default:
-                        System.out.println("Ошибка! Введите 0, 1 или 2");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Ошибка! Введите число, а не текст.");
-                scanner.next(); // Очистка неправильного ввода
-            }
-        }
-        scanner.close();
-    }
-
-    static void playGame() {
-        boolean playAgain = true;
-
-        while (playAgain) {
-            int secretNumber = random.nextInt(maxNumber + 1);
-            boolean guessed = false;
-
-            System.out.println("\nУгадайте число от 0 до " + maxNumber);
-            System.out.println("У вас " + attempts + " попыток");
-
-            for (int i = 0; i < attempts && !guessed; i++) {
-                System.out.print("Попытка " + (i + 1) + "/" + attempts + ": ");
-
-                try {
-                    int guess = scanner.nextInt();
-
-                    if (guess == secretNumber) {
-                        System.out.println("Поздравляем! Вы угадали!");
-                        guessed = true;
-                    } else if (guess > secretNumber) {
-                        System.out.println("Слишком много!");
-                    } else {
-                        System.out.println("Слишком мало!");
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Ошибка! Введите число, а не текст.");
-                    scanner.next(); // Очистка неправильного ввода
-                    i--; // Не засчитываем эту попытку
-                }
-            }
-
-            if (!guessed) {
-                System.out.println("К сожалению, вы не угадали. Число было: " + secretNumber);
-            }
-
-            System.out.print("\nСыграем ещё раз? (1 - Да, 0 - Нет): ");
-            try {
-                int choice = scanner.nextInt();
-                playAgain = (choice == 1);
-            } catch (InputMismatchException e) {
-                System.out.println("Ошибка ввода! Игра завершена.");
-                playAgain = false;
-            }
+    // Метод для бега
+    public void run(int distance) {
+        if (distance <= runLimit) {
+            System.out.println(name + " пробежал " + distance + " м.");
+        } else {
+            System.out.println(name + " не может пробежать " + distance + " м. (лимит " + runLimit + " м.)");
         }
     }
 
-    static void showOptions() {
-        boolean exit = false;
-
-        System.out.println("\n=== Настройки игры ===");
-        while (!exit) {
-            System.out.println("\n0 - Назад");
-            System.out.println("1 - Изменить количество попыток (текущее: " + attempts + ")");
-            System.out.println("2 - Изменить максимальное число (текущее: " + maxNumber + ")");
-
-            try {
-                int choice = scanner.nextInt();
-                switch (choice) {
-                    case 0:
-                        exit = true;
-                        break;
-                    case 1:
-                        System.out.print("Введите новое количество попыток: ");
-                        attempts = scanner.nextInt();
-                        break;
-                    case 2:
-                        System.out.print("Введите новое максимальное число: ");
-                        maxNumber = scanner.nextInt();
-                        break;
-                    default:
-                        System.out.println("Ошибка! Введите 0, 1 или 2");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Ошибка! Введите число, а не текст.");
-                scanner.next();
-            }
+    // Метод для плавания
+    public void swim(int distance) {
+        if (swimLimit == 0) {
+            System.out.println(name + " не умеет плавать.");
+        } else if (distance <= swimLimit) {
+            System.out.println(name + " проплыл " + distance + " м.");
+        } else {
+            System.out.println(name + " не может проплыть " + distance + " м. (лимит " + swimLimit + " м.)");
         }
+    }
+
+    // Геттер для счетчика животных
+    public static int getAnimalCount() {
+        return animalCount;
+    }
+}
+
+// Класс Cat наследуется от Animal
+class Cat extends Animal {
+    private static int catCount = 0; // Счетчик созданных котов
+
+    public Cat(String name) {
+        super(name, 200, 0);
+        catCount++;
+    }
+
+    // Геттер для счетчика котов
+    public static int getCatCount() {
+        return catCount;
+    }
+}
+
+// Класс Dog наследуется от Animal
+class Dog extends Animal {
+    private static int dogCount = 0; // Счетчик созданных собак
+
+    public Dog(String name) {
+        super(name, 500, 10);
+        dogCount++;
+    }
+
+    // Геттер для счетчика собак
+    public static int getDogCount() {
+        return dogCount;
     }
 }
